@@ -1,0 +1,145 @@
+;Keegan Maundrell
+
+;GRAPHICS
+Graphics(800,600,0,2)
+AppTitle ("Sound and Music")
+SetBuffer(BackBuffer())
+
+;constants
+Const escKey 	= 1
+Const spaceBar 	= 57
+
+
+;Load Sound & Music
+died = LoadSound ("Died.wav")
+
+;globals
+Global volume#	= 0.00	;the volume of the music 
+Global pan#		= 0.00	;the pan of the music
+Global playX 	= 0
+Global playY 	= 0
+Global music
+
+;MAIN
+
+music = PlayMusic ("Gwyn.mp3")
+
+Repeat
+	Cls()
+	
+	HUD()
+	TrackMouse()
+	
+	If (KeyHit(spaceBar))
+		PlaySound died
+	EndIf
+
+	;draws the square
+	Line(100,175,700,175)
+	Line(100,175,100,575)
+	Line(100,575,700,575)
+	Line(700,575,700,175)
+	
+	Flip()
+Until(KeyHit(escKey))
+End()
+;END MAIN
+
+
+
+
+;FUNCTIONS
+
+Function TrackMouse()
+	;formula's for volume and panning
+	volume# = (((MouseY()-575)*-1)/4)*10^-2
+	pan# = ((MouseX()-400)*10^-2)/3
+	
+	
+	
+	
+	
+	
+	
+	;limits the volume and pitxh to inside the box	
+	If MouseX() < 100
+		pan# = 0
+		volume# = 0
+	ElseIf MouseX() > 700
+		pan# = 0
+		volume# = 0
+	EndIf
+	
+	;limits the volume and pitxh to inside the box	
+	If MouseY() < 175
+		volume# = 0
+		pan# = 0
+	ElseIf MouseY() > 575
+		volume# = 0
+		pan# = 0
+	EndIf
+	
+	;if the mouse is inside the box, the music plays
+	If MouseX() >= 100
+		playX = 1
+	EndIf
+	
+	If MouseX() <= 700
+		playX = 1
+	EndIf
+	
+	;if the mouse is inside the box, the music plays
+	If MouseY() >= 175
+		playY = 1
+	EndIf
+
+	If MouseY() <= 575
+		playY = 1
+	EndIf
+	
+	;if the mouse leaves the box, the music pauses
+	If MouseX() < 100
+		playX = 0
+	EndIf
+
+	If MouseX() > 700
+		playX = 0
+	EndIf
+	
+	;if the mouse leaves the box, the music pauses
+	If MouseY() < 175
+		playY = 0
+	EndIf
+
+	If MouseY() > 575
+		playY = 0
+	EndIf
+
+	;plays the music
+	If playX = 1 And playY = 1
+		ResumeChannel (music)	
+	EndIf
+
+	;pauses the music	
+	If playX = 0 Or playY = 0
+		PauseChannel (music)
+	EndIf
+	
+	;music settings based on the box
+	
+	ChannelVolume (music,volume#)
+	
+	ChannelPan (music,pan#)
+	
+End Function
+
+Function HUD()
+	Text(15,15,"The Mouse's X Position Is: " + MouseX())
+	Text(15,30,"The Mouse's Y Position Is: " + MouseY())
+	Text(15,45,"The Music's Volume Is: " + volume#)
+	Text(15,60,"The Music's Pan Is: " + pan#)
+	Text(15,75,playX)
+	Text(15,90,playY)
+End Function
+
+;END FUNCTIONS
